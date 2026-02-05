@@ -71,4 +71,20 @@ $cfg = set_config_value($cfg, 'smtp_pass', envv('smtp_pass'));
 
 $cfg = set_config_value($cfg, 'db_auth_host',   envv('db_auth_host'));
 $cfg = set_config_value($cfg, 'db_auth_pass',   envv('db_auth_pass'));
-$cfg = s
+$cfg = set_config_value($cfg, 'db_auth_dbname', envv('db_auth_dbname'));
+
+// Realm 1 (realmlists["1"])
+$cfg = set_realm1_value($cfg, 'realmname', envv('realmname'));
+$cfg = set_realm1_value($cfg, 'db_host',   envv('db_host'));
+$cfg = set_realm1_value($cfg, 'db_port',   envv('db_port'));
+$cfg = set_realm1_value($cfg, 'db_user',   envv('db_user'));
+$cfg = set_realm1_value($cfg, 'db_pass',   envv('db_pass'));
+$cfg = set_realm1_value($cfg, 'db_name',   envv('db_name'));
+
+if (file_put_contents($file, $cfg) === false) {
+    fwrite(STDERR, "Could not write config file: $file\n");
+    exit(1);
+}
+PHP
+
+exec "$@"
