@@ -35,7 +35,6 @@ secrets/
 *.crt
 
 # ---- App specific configs (keep samples, ignore real config) ----
-application/config/config.php
 application/config/*.local.php
 
 # ---- Docker ----
