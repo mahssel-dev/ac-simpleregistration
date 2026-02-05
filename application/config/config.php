@@ -71,7 +71,7 @@ $config['srp6_support'] = true; // Important: Enable the GMP extension for PHP i
 1 = SRP6v1
 2 = SRP6v2
  */
-$config['srp6_version'] = 0‚;
+$config['srp6_version'] = 0;
 
 // Feature Toggles - Control whether certain pages or features should be disabled.
 $config['disable_top_players'] = false; // Set to true to hide the top players page.

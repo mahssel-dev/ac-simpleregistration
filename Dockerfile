@@ -20,7 +20,7 @@ RUN set -eux; \
     docker-php-ext-install -j"$(nproc)" \
       gd gmp zip soap mbstring pdo pdo_mysql
 
-‚RUN { \
+RUN { \
   echo "log_errors=On"; \
   echo "error_reporting=E_ALL"; \
   echo "display_errors=On"; \
