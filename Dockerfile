@@ -30,3 +30,9 @@ COPY . /var/www/html
 RUN cd /var/www/html/application && composer install --no-dev --prefer-dist --no-interaction
 
 RUN chown -R www-data:www-data /var/www/html
+
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apache2-foreground"]
