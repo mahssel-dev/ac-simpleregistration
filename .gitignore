@@ -1,0 +1,53 @@
+# ---- OS / Editor / IDE ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ---- Logs / Runtime ----
+*.log
+logs/
+log/
+tmp/
+temp/
+cache/
+*.pid
+
+# ---- PHP / Composer ----
+vendor/
+**/vendor/
+composer.phar
+composer.lock
+
+# ---- Environment / Secrets ----
+.env
+.env.*
+!.env.example
+*.local
+*.secret
+secrets/
+*.pem
+*.key
+*.crt
+
+# ---- App specific configs (keep samples, ignore real config) ----
+application/config/config.php
+application/config/*.local.php
+
+# ---- Docker ----
+docker-compose.override.yml
+*.docker.env
+
+# ---- Build artifacts ----
+dist/
+build/
+coverage/
+.phpunit.result.cache
+
+# ---- PHPUnit / Testing ----
+phpunit.xml
+phpunit.xml.dist.bak
