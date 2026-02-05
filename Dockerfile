@@ -20,6 +20,13 @@ RUN set -eux; \
     docker-php-ext-install -j"$(nproc)" \
       gd gmp zip soap mbstring pdo pdo_mysql
 
+‚RUN { \
+  echo "log_errors=On"; \
+  echo "error_reporting=E_ALL"; \
+  echo "display_errors=On"; \
+  echo "error_log=/proc/self/fd/2"; \
+} > /usr/local/etc/php/conf.d/99-docker-logging.ini
+
 RUN a2enmod rewrite
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
