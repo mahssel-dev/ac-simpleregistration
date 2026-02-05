@@ -1,14 +1,24 @@
 FROM php:8.2-apache
 
-RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev \
-    libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
-    libgmp-dev \
- && rm -rf /var/lib/apt/lists/*
+FROM php:8.2-apache
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" \
-    gd gmp zip soap mbstring pdo pdo_mysql
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      git unzip \
+      pkg-config \
+      libzip-dev \
+      libxml2-dev \
+      libonig-dev \
+      libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+      libgmp-dev \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" \
+      gd gmp zip soap mbstring pdo pdo_mysql
 
 RUN a2enmod rewrite
 
