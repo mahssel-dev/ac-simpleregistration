@@ -216,3 +216,48 @@ Looking for more visuals? [Browse additional screenshots here.](https://github.c
 - **Portuguese**: [xnexuiz](https://github.com/xnexuiz)
 
 Heartfelt thanks to all the contributors for their invaluable support and contributions to this project.
+
+
+
+### Example for docker-compose.yml
+
+```
+services:
+  wowsimplereg:
+    image: ghcr.io/<dein-user>/wowsimplereg:latest
+    restart: unless-stopped
+
+    environment:
+      baseurl: "https://reg.example.com"
+      realmlist: "logon.myserver.com"
+
+      smtp_host: "smtp1.example.com"
+      smtp_user: "user@example.com"
+      smtp_pass: "SECRET"
+
+      db_auth_host: "ac-mysql"
+      db_auth_pass: "supersecret"
+      db_auth_dbname: "acore_auth"
+
+      realmname: "Realm 1"
+      db_host: "ac-mysql"
+      db_port: "3306"
+      db_user: "acore"
+      db_pass: "supersecret"
+      db_name: "acore_characters"
+
+    networks:
+      - proxy
+      - ac-network
+
+    expose:
+      - "80"
+
+networks:
+  proxy:
+    external: true
+
+  ac-network:
+    name: ${DOCKER_AC_NETWORK_NAME:-azerothcore-wotlk_ac-network}
+    external: true
+```
