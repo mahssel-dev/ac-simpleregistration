@@ -7,7 +7,7 @@ $API_KEY = 'CHANGE_ME_SUPER_LONG_RANDOM';
 // Whitelist: nur diese Keys sind erlaubt
 $FILES = [
   'win64' => [
-    'url'      => 'https://adamnhm.freeddns.org/patches/files/Updater/WowUpdater-win64.zip',
+    'url'      => 'https://adamnhm.freeddns.org/patches/files/Updater/WowUpdater-win-x64.zip',
     'filename' => 'WowUpdater-win64.zip',
   ],
   'osx-x64' => [
