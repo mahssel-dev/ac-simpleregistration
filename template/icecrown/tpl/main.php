@@ -50,17 +50,7 @@ require_once 'header.php'; ?>
                         <?php elang('welcome_message'); ?>
                         <hr style="border-color: #00CCFF;">
                         <p style="text-align: justify">
-                            This is a sample text, This is a sample text, This is a sample text, This is a sample
-                            text, This is a sample text, This is a sample text, This is a sample text, This is a
-                            sample text, This is a sample text, This is a sample text, This is a sample text, This
-                            is a sample text, This is a sample text, This is a sample text, This is a sample text,
-                            This is a sample text, This is a sample text, This is a sample text, This is a sample
-                            text, This is a sample text, This is a sample text, This is a sample text, This is a
-                            sample text, This is a sample text, This is a sample text, This is a sample text, This
-                            is a sample text, This is a sample text, This is a sample text, This is a sample text,
-                            This is a sample text, This is a sample text, This is a sample text, This is a sample
-                            text, This is a sample text, This is a sample text, This is a sample text, This is a
-                            sample text, This is a sample text.
+                            Ich hab euch hier mal einen Server aufgesetzt, um an alte Zeiten zu erinnern und bisch zu leveln ;)
                         </p>
                         <p><?php elang('edit_on'); ?> template/<?php echo $antiXss->xss_clean(get_config("template")); ?>
                             /tpl/main.php</p>
@@ -518,12 +508,6 @@ require_once 'header.php'; ?>
             </form>
             </div>
              <?php } ?>
-            <div class="box1">
-                Discord
-                <hr style="border-color: #00CCFF;">
-                <iframe src="https://discordapp.com/widget?id=376650959532589057&theme=dark" width="330"
-                        height="600" allowtransparency="true" frameborder="0"></iframe>
-            </div>
         </div>
     </div>
 </div>
