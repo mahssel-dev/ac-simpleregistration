@@ -181,7 +181,6 @@ echo "<style>
 </style></head><body>";
 
 echo "<h1>Updater Downloads</h1>";
-echo "<p class='muted'>Quelle: <code>" . h($REMOTE_DIR) . "</code></p>";
 
 if (!$filenames) {
   echo "<p><strong>Keine .zip Dateien gefunden.</strong></p>";
