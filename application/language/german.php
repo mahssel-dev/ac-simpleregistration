@@ -18,7 +18,7 @@ $language['change_lang_head'] = 'Sprache ändern';
 $language['change_lang_form_head'] = 'Sprache auswählen';
 $language['change_lang_sub'] = 'Ändern';
 
-$language['welcome_to'] = 'Willkommen bei';
+$language['welcome_to'] = 'Willkommen beim Ghulbus';
 $language['welcome_message'] = 'Willkommen bei unserem Privat Server, Tritt uns bei!';
 $language['get_started'] = 'Starte jetzt';
 $language['home'] = 'Start';
@@ -41,13 +41,18 @@ $language['edit_on'] = 'Hier bearbeiten:';
 $language['server_address'] = 'Server-Adresse';
 $language['realmlist'] = 'Realmliste';
 $language['create_account'] = 'Account erstellen';
-$language['create_account_tip1'] = 'Als erstes, musst du dir einen Account erstellen. Diesen Account nutzt du sowohl zum Login auf der Website als auch im spiel. Klicke hier um das Formular zu öffnen';
-$language['download_game'] = 'Spiel Runterladen';
-$language['create_account_tip2'] = 'Lade World of Warcraft runter. Du kannst es (Legal) hier runterladen: Windows oder Mac. Gehe sicher das es die Richtige version ist:'. get_config('game_version').'.';
+$language['create_account_tip1'] = 'Als erstes, musst du dir einen Account erstellen. Diesen Account nutzt du sowohl zum Login auf der Website als auch im Spiel.';
+$language['download_game'] = 'Spiel herunterladen';
+$language['create_account_tip2'] =
+  'Lade World of Warcraft herunter. Du kannst es hier herunterladen: '
+  . '<a href="/download.php?file=win64" target="_blank" rel="noopener">WoWUpdater (Windows 64-bit)</a>, '
+  . '<a href="/download.php?file=osx-x64" target="_blank" rel="noopener">WoWUpdater (macOS Intel x64)</a> '
+  . 'oder <a href="/download.php?file=osx-arm64" target="_blank" rel="noopener">WoWUpdater (macOS Apple Silicon arm64)</a>. '
+  . 'Stelle sicher, dass es die richtige Version ist: ' . get_config('game_version') . '.';
 $language['setup_game'] = 'Spiel richtig einstellen';
-$language['create_account_tip3'] = 'Öffne deinen "World of Warcraft" Ordner. Normalerweise ist das "C:\Program Files\World of Warcraft". Wenn du ihn gefunden hast, öffne den Ordner "data", gehe dann in den Ordner enUS, enGB oder deDE, jenachdem welche Sprache dein World of Warcraft hat.';
+$language['create_account_tip3'] = 'Entpacke und starte den soeben geladenen Updater, wähle dort die richtigen Verzeichnisse. Falls nötig, kann dort nocht der Client herunter geladen werden';
 $language['change_server_address'] = 'Ändere die Server-Adresse';
-$language['create_account_tip4'] = 'Markiere den ganzen Text und ersetze ihn mit:';
+$language['create_account_tip4'] = 'Wähle dann die Wow.exe. Die Realmlist sowie etwaige Patches werden automatisch installiert.';
 $language['server_rules'] = 'Server Regeln';
 $language['read_before_register'] = 'VOR DEM ANMELDEN LESEN!';
 $language['read_our_rules'] = 'Bitte lese unsere Regeln.';
