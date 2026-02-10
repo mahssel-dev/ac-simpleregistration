@@ -45,9 +45,9 @@ $language['create_account_tip1'] = 'Als erstes, musst du dir einen Account erste
 $language['download_game'] = 'Spiel herunterladen';
 $language['create_account_tip2'] =
   'Lade World of Warcraft herunter. Du kannst es hier herunterladen: '
-  . '<a href="/download.php?file=win64" target="_blank" rel="noopener">WoWUpdater (Windows 64-bit)</a>, '
-  . '<a href="/download.php?file=osx-x64" target="_blank" rel="noopener">WoWUpdater (macOS Intel x64)</a> '
-  . 'oder <a href="/download.php?file=osx-arm64" target="_blank" rel="noopener">WoWUpdater (macOS Apple Silicon arm64)</a>. '
+  . '<a href="/register/download.php?file=win64" target="_blank" rel="noopener">WoWUpdater (Windows 64-bit)</a>, '
+  . '<a href="/register/download.php?file=osx-x64" target="_blank" rel="noopener">WoWUpdater (macOS Intel x64)</a> '
+  . 'oder <a href="/register/download.php?file=osx-arm64" target="_blank" rel="noopener">WoWUpdater (macOS Apple Silicon arm64)</a>. '
   . 'Stelle sicher, dass es die richtige Version ist: ' . get_config('game_version') . '.';
 $language['setup_game'] = 'Spiel richtig einstellen';
 $language['create_account_tip3'] = 'Entpacke und starte den soeben geladenen Updater, wähle dort die richtigen Verzeichnisse. Falls nötig, kann dort nocht der Client herunter geladen werden';
