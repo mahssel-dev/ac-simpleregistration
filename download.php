@@ -37,7 +37,6 @@ function curlGetHtml(string $url, string $apiKey): array {
 function parseNginxAutoindex(string $html, array $allowedExt): array {
   $files = [];
 
-  // Robust gegen "komisches" HTML
   $dom = new DOMDocument();
   libxml_use_internal_errors(true);
   $dom->loadHTML($html);
@@ -47,15 +46,10 @@ function parseNginxAutoindex(string $html, array $allowedExt): array {
     $href = (string)$a->getAttribute('href');
     if ($href === '' || $href === '../') continue;
 
-    // remove query/fragment
     $href = preg_replace('~[?#].*$~', '', $href);
-
-    // skip directories
     if (str_ends_with($href, '/')) continue;
 
     $name = basename($href);
-
-    // sanity
     if ($name === '' || str_contains($name, '/') || str_contains($name, "\0")) continue;
 
     $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
@@ -64,10 +58,53 @@ function parseNginxAutoindex(string $html, array $allowedExt): array {
     $files[$name] = true;
   }
 
-  $out = array_keys($files);
-  natcasesort($out);
-  return array_values($out);
+  $list = array_keys($files);
+
+  // --- Custom Sort: version desc, then name asc ---
+  usort($list, function(string $a, string $b): int {
+    $va = extractVersionForSort($a);
+    $vb = extractVersionForSort($b);
+
+    // 1) Version DESC (neueste zuerst)
+    $cmpV = compareVersionsDesc($va, $vb);
+    if ($cmpV !== 0) return $cmpV;
+
+    // 2) Innerhalb der gleichen Version alphabetisch (natural, case-insensitive)
+    return strnatcasecmp($a, $b);
+  });
+
+  return $list;
 }
+
+/**
+ * Extrahiert eine Version aus dem Dateinamen.
+ * Erwartet irgendwo ".v<version>" oder "-v<version>" oder "v<version>".
+ * Gibt die Version als String zurück (ohne führendes v), oder "" wenn keine gefunden.
+ */
+function extractVersionForSort(string $filename): string {
+  // Beispiele: ".v1.1.9d", "-v1.2.0", "v1.2.0-beta1"
+  if (preg_match('~(?:^|[.\-_])v(\d+(?:\.\d+)*[0-9A-Za-z\-\.]*)~', $filename, $m)) {
+    return strtolower($m[1]);
+  }
+  return '';
+}
+
+/**
+ * Vergleicht zwei Versionsstrings DESC.
+ * - Nutzt version_compare, aber macht "" (keine Version) immer "am kleinsten".
+ */
+function compareVersionsDesc(string $a, string $b): int {
+  if ($a === '' && $b === '') return 0;
+  if ($a === '') return 1;   // a ohne Version -> nach hinten
+  if ($b === '') return -1;  // b ohne Version -> nach hinten
+
+  // version_compare: -1 wenn a<b, 0, 1 wenn a>b
+  // Für DESC drehen wir das Vorzeichen um.
+  $cmp = version_compare($a, $b);
+  if ($cmp === 0) return 0;
+  return ($cmp > 0) ? -1 : 1;
+}
+
 
 function streamRemoteFile(string $url, string $apiKey, string $downloadName): void {
   $ch = curl_init($url);
