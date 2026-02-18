@@ -34,77 +34,70 @@ function curlGetHtml(string $url, string $apiKey): array {
   return [$code, $body === false ? '' : $body, $err];
 }
 
-function parseNginxAutoindex(string $html, array $allowedExt): array {
-  $files = [];
+function extractVersionForSort(string $filename): string {
+  // findet z.B. ".v1.1.9d", "-v1.2.0", "_v1.2.0-beta1"
+  if (preg_match('~(?:^|[.\-_])v(\d+(?:\.\d+)*[0-9A-Za-z\-\.]*)~', $filename, $m)) {
+    return strtolower($m[1]); // ohne führendes v
+  }
+  return '';
+}
 
+function parseNginxAutoindexGrouped(string $html, array $allowedExt): array {
   $dom = new DOMDocument();
   libxml_use_internal_errors(true);
   $dom->loadHTML($html);
   libxml_clear_errors();
 
+  $groups = []; // version => [files...]
+
   foreach ($dom->getElementsByTagName('a') as $a) {
     $href = (string)$a->getAttribute('href');
     if ($href === '' || $href === '../') continue;
 
+    // remove query/fragment
     $href = preg_replace('~[?#].*$~', '', $href);
+
+    // skip directories
     if (str_ends_with($href, '/')) continue;
 
     $name = basename($href);
+
+    // sanity
     if ($name === '' || str_contains($name, '/') || str_contains($name, "\0")) continue;
 
     $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExt, true)) continue;
 
-    $files[$name] = true;
+    $ver = extractVersionForSort($name);
+    if ($ver === '') $ver = 'unversioned';
+
+    $groups[$ver][] = $name;
   }
 
-  $list = array_keys($files);
+  // Dateien je Version alphabetisch + unique
+  foreach ($groups as &$files) {
+    $uniq = array_values(array_unique($files));
+    natcasesort($uniq);
+    $files = array_values($uniq);
+  }
+  unset($files);
 
-  // --- Custom Sort: version desc, then name asc ---
-  usort($list, function(string $a, string $b): int {
-    $va = extractVersionForSort($a);
-    $vb = extractVersionForSort($b);
+  // Versionen absteigend sortieren (unversioned zuletzt)
+  $versions = array_keys($groups);
+  usort($versions, function(string $a, string $b): int {
+    if ($a === 'unversioned' && $b === 'unversioned') return 0;
+    if ($a === 'unversioned') return 1;
+    if ($b === 'unversioned') return -1;
 
-    // 1) Version DESC (neueste zuerst)
-    $cmpV = compareVersionsDesc($va, $vb);
-    if ($cmpV !== 0) return $cmpV;
-
-    // 2) Innerhalb der gleichen Version alphabetisch (natural, case-insensitive)
-    return strnatcasecmp($a, $b);
+    $cmp = version_compare($a, $b);
+    if ($cmp === 0) return 0;
+    return ($cmp > 0) ? -1 : 1; // DESC
   });
 
-  return $list;
+  $sorted = [];
+  foreach ($versions as $v) $sorted[$v] = $groups[$v];
+  return $sorted;
 }
-
-/**
- * Extrahiert eine Version aus dem Dateinamen.
- * Erwartet irgendwo ".v<version>" oder "-v<version>" oder "v<version>".
- * Gibt die Version als String zurück (ohne führendes v), oder "" wenn keine gefunden.
- */
-function extractVersionForSort(string $filename): string {
-  // Beispiele: ".v1.1.9d", "-v1.2.0", "v1.2.0-beta1"
-  if (preg_match('~(?:^|[.\-_])v(\d+(?:\.\d+)*[0-9A-Za-z\-\.]*)~', $filename, $m)) {
-    return strtolower($m[1]);
-  }
-  return '';
-}
-
-/**
- * Vergleicht zwei Versionsstrings DESC.
- * - Nutzt version_compare, aber macht "" (keine Version) immer "am kleinsten".
- */
-function compareVersionsDesc(string $a, string $b): int {
-  if ($a === '' && $b === '') return 0;
-  if ($a === '') return 1;   // a ohne Version -> nach hinten
-  if ($b === '') return -1;  // b ohne Version -> nach hinten
-
-  // version_compare: -1 wenn a<b, 0, 1 wenn a>b
-  // Für DESC drehen wir das Vorzeichen um.
-  $cmp = version_compare($a, $b);
-  if ($cmp === 0) return 0;
-  return ($cmp > 0) ? -1 : 1;
-}
-
 
 function streamRemoteFile(string $url, string $apiKey, string $downloadName): void {
   $ch = curl_init($url);
@@ -117,7 +110,7 @@ function streamRemoteFile(string $url, string $apiKey, string $downloadName): vo
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_FAILONERROR    => false,
     CURLOPT_CONNECTTIMEOUT => 10,
-    CURLOPT_TIMEOUT        => 0,
+    CURLOPT_TIMEOUT        => 0, // stream until done
     CURLOPT_HTTPHEADER     => [
       'X-Api-Key: ' . $apiKey,
       'Cache-Control: no-cache',
@@ -143,7 +136,7 @@ function streamRemoteFile(string $url, string $apiKey, string $downloadName): vo
     return $len;
   });
 
-  // Body nur bei 200 ausgeben, sonst Fehlertext (kein 153B Fake-Zip)
+  // Body nur bei 200 ausgeben, sonst Fehlertext (kein Fake-Zip)
   curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $chunk) use (&$status, &$sentHeaders, $url) {
     if ($status !== 200) {
       if (!$sentHeaders) {
@@ -185,14 +178,19 @@ if ($code !== 200 || $html === '') {
   exit;
 }
 
-$filenames = parseNginxAutoindex($html, $ALLOWED_EXT);
+$groups = parseNginxAutoindexGrouped($html, $ALLOWED_EXT);
 
 // ========= Download Mode =========
 if (isset($_GET['name'])) {
   $name = (string)$_GET['name'];
 
-  // Nur erlauben, was wirklich im Listing vorkam
-  if (!in_array($name, $filenames, true)) {
+  // Nur erlauben, was wirklich im Listing vorkam (in irgendeiner Gruppe)
+  $allowed = false;
+  foreach ($groups as $files) {
+    if (in_array($name, $files, true)) { $allowed = true; break; }
+  }
+
+  if (!$allowed) {
     http_response_code(404);
     header('Content-Type: text/plain; charset=utf-8');
     echo "Datei nicht gefunden oder nicht erlaubt.\n";
@@ -213,24 +211,27 @@ echo "<style>
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:24px;max-width:900px}
   ul{padding-left:18px}
   li{margin:10px 0}
-  .muted{color:#666}
+  h2{margin-top:22px}
   code{background:#f4f4f4;padding:2px 6px;border-radius:6px}
 </style></head><body>";
 
 echo "<h1>Updater Downloads</h1>";
 
-if (!$filenames) {
+if (!$groups) {
   echo "<p><strong>Keine .zip Dateien gefunden.</strong></p>";
   echo "</body></html>";
   exit;
 }
 
-echo "<ul>";
-foreach ($filenames as $fn) {
-  // RELATIVER Link -> /register bleibt erhalten
-  $href = "download.php?name=" . rawurlencode($fn);
-  echo "<li><a href='" . h($href) . "'>" . h($fn) . "</a></li>";
+foreach ($groups as $ver => $files) {
+  $title = ($ver === 'unversioned') ? 'Ohne Version' : ('v' . $ver);
+  echo "<h2>" . h($title) . "</h2>";
+  echo "<ul>";
+  foreach ($files as $fn) {
+    $href = "download.php?name=" . rawurlencode($fn);
+    echo "<li><a href='" . h($href) . "'>" . h($fn) . "</a></li>";
+  }
+  echo "</ul>";
 }
-echo "</ul>";
 
 echo "</body></html>";
