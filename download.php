@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // ========= Konfiguration =========
 $API_KEY = 'CHANGE_ME_SUPER_LONG_RANDOM';
-$REMOTE_DIR = 'https://adamnhm.freeddns.org/patches/files/Updater/'; // muss mit / enden
+$REMOTE_DIR = 'https://adamhome.mytunnel.org/patches/files/Updater/'; // muss mit / enden
 $ALLOWED_EXT = ['zip'];
 
 // ========= Helpers =========
