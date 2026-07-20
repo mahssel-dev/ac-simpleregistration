@@ -1,7 +1,5 @@
 FROM php:8.2-apache
 
-FROM php:8.2-apache
-
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
@@ -28,6 +26,8 @@ RUN { \
 } > /usr/local/etc/php/conf.d/99-docker-logging.ini
 
 RUN a2enmod rewrite
+
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
